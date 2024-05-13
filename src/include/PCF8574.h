@@ -120,6 +120,10 @@ typedef struct PCF8574_Handler_s
   // I2C Address
   uint8_t AddressI2C;
 
+  // I/O buffers
+  uint8_t Direction;
+  uint8_t Output;
+
   // Platform dependent layer
   PCF8574_Platform_t Platform;
 } PCF8574_Handler_t;
@@ -205,6 +209,50 @@ PCF8574_DeInit(PCF8574_Handler_t *Handler);
  */
 PCF8574_Result_t
 PCF8574_SetAddressI2C(PCF8574_Handler_t *Handler, uint8_t Address);
+
+
+
+/**
+ ==================================================================================
+                             ##### I/O Functions #####                             
+ ==================================================================================
+ */
+
+/**
+ * @brief  Set direction of pins
+ * @param  Handler: Pointer to handler
+ * @param  Dir: Direction of pins (1: Output, 0: Input)
+ * @retval PCF8574_Result_t
+ *         - PCF8574_OK: Operation was successful.
+ *         - PCF8574_FAIL: Failed to send or receive data.
+ */
+PCF8574_Result_t
+PCF8574_SetDir(PCF8574_Handler_t *Handler, uint8_t Dir);
+
+
+/**
+ * @brief  Read data from the device
+ * @param  Handler: Pointer to handler
+ * @param  Data: Pointer to data
+ * @retval PCF8574_Result_t
+ *         - PCF8574_OK: Operation was successful.
+ *         - PCF8574_FAIL: Failed to send or receive data.
+ */
+PCF8574_Result_t
+PCF8574_Read(PCF8574_Handler_t *Handler, uint8_t *Data);
+
+
+/**
+ * @brief  Write data to the device
+ * @param  Handler: Pointer to handler
+ * @param  Data: Data to write
+ * @retval PCF8574_Result_t
+ *         - PCF8574_OK: Operation was successful.
+ *         - PCF8574_FAIL: Failed to send or receive data.
+ */
+PCF8574_Result_t
+PCF8574_Write(PCF8574_Handler_t *Handler, uint8_t Data);
+
 
 
 #ifdef __cplusplus

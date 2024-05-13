@@ -37,8 +37,33 @@
 /**
  * @brief  I2C device addresses
  */
-#define PCF8574_I2C_ADDRESS_BASE    0x40
-#define PCF8574A_I2C_ADDRESS_BASE   0x70
+#define PCF8574_I2C_ADDRESS_BASE    0x20
+#define PCF8574A_I2C_ADDRESS_BASE   0x38
+
+
+
+/**
+ ==================================================================================
+                       ##### Private Functions #####
+ ==================================================================================
+ */
+static PCF8574_Result_t
+PCF8574_WriteReg(PCF8574_Handler_t *Handler, uint8_t Data)
+{
+  if (Handler->Platform.Send(Handler->AddressI2C, &Data, 1) < 0)
+    return PCF8574_FAIL;
+
+  return PCF8574_OK;
+}
+
+static PCF8574_Result_t
+PCF8574_ReadReg(PCF8574_Handler_t *Handler, uint8_t *Data)
+{
+  if (Handler->Platform.Receive(Handler->AddressI2C, Data, 1) < 0)
+    return PCF8574_FAIL;
+
+  return PCF8574_OK;
+}
 
 
 
@@ -83,6 +108,10 @@ PCF8574_Init(PCF8574_Handler_t *Handler, PCF8574_Device_t Device,
     if (Handler->Platform.Init() < 0)
       return PCF8574_FAIL;
   }
+
+  Handler->Direction = 0x00;
+  if (PCF8574_WriteReg(Handler, ~(Handler->Direction)) != PCF8574_OK)
+    return PCF8574_FAIL;
 
   return PCF8574_OK;
 }
@@ -136,5 +165,60 @@ PCF8574_SetAddressI2C(PCF8574_Handler_t *Handler, uint8_t Address)
     return PCF8574_INVALID_PARAM;
   }
 
+  return PCF8574_OK;
+}
+
+/**
+ * @brief  Set direction of pins
+ * @param  Handler: Pointer to handler
+ * @param  Dir: Direction of pins (1: Output, 0: Input)
+ * @retval PCF8574_Result_t
+ *         - PCF8574_OK: Operation was successful.
+ *         - PCF8574_FAIL: Failed to send or receive data.
+ */
+PCF8574_Result_t
+PCF8574_SetDir(PCF8574_Handler_t *Handler, uint8_t Dir)
+{
+  Handler->Direction = Dir;
+  return PCF8574_OK;
+}
+
+
+/**
+ * @brief  Read data from the device
+ * @param  Handler: Pointer to handler
+ * @param  Data: Pointer to data
+ * @retval PCF8574_Result_t
+ *         - PCF8574_OK: Operation was successful.
+ *         - PCF8574_FAIL: Failed to send or receive data.
+ */
+PCF8574_Result_t
+PCF8574_Read(PCF8574_Handler_t *Handler, uint8_t *Data)
+{
+  Handler->Output |= ~(Handler->Direction);
+  if (PCF8574_WriteReg(Handler, Handler->Output) != PCF8574_OK)
+    return PCF8574_FAIL;
+
+  if (PCF8574_ReadReg(Handler, Data) != PCF8574_OK)
+    return PCF8574_FAIL;
+
+  return PCF8574_OK;
+}
+
+
+/**
+ * @brief  Write data to the device
+ * @param  Handler: Pointer to handler
+ * @param  Data: Data to write
+ * @retval PCF8574_Result_t
+ *         - PCF8574_OK: Operation was successful.
+ *         - PCF8574_FAIL: Failed to send or receive data.
+ */
+PCF8574_Result_t
+PCF8574_Write(PCF8574_Handler_t *Handler, uint8_t Data)
+{
+  Handler->Output = Data | (~(Handler->Direction));
+  if (PCF8574_WriteReg(Handler, Handler->Output) != PCF8574_OK)
+    return PCF8574_FAIL;
   return PCF8574_OK;
 }
