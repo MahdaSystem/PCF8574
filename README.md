@@ -1,5 +1,5 @@
 # PCF8574 Library
-Driver for PCF8574 8-bit I/O expander.
+Driver for PCF8574 and PCF8574A 8-bit I/O expander.
 
 
 ## Hardware Support

@@ -2,7 +2,7 @@
  **********************************************************************************
  * @file   PCF8574.c
  * @author Hossein.M (https://github.com/Hossein-M98)
- * @brief  PCF8574 8-bit I/O expander driver
+ * @brief  PCF8574 and PCF8574A 8-bit I/O expander driver
  **********************************************************************************
  *
  * Copyright (c) 2024 Mahda Embedded System (MIT License)
@@ -33,6 +33,14 @@
 #include <stdio.h>
 
 
+/* Private Constants ------------------------------------------------------------*/
+/**
+ * @brief  I2C device addresses
+ */
+#define PCF8574_I2C_ADDRESS_BASE    0x40
+#define PCF8574A_I2C_ADDRESS_BASE   0x70
+
+
 
 /**
  ==================================================================================
@@ -45,15 +53,26 @@
  * @note   This function must be called after initializing platform dependent
  *         layer and before using other functions.
  * @param  Handler: Pointer to handler
+ * @param  Device: Device type
+ * @param  Address: Address pins state (0 <= Address <= 7)
  * @retval PCF8574_Result_t
  *         - PCF8574_OK: Operation was successful.
  *         - PCF8574_FAIL: Failed to send or receive data.
  *         - PCF8574_INVALID_PARAM: Invalid parameter.
  */
 PCF8574_Result_t
-PCF8574_Init(PCF8574_Handler_t *Handler)
+PCF8574_Init(PCF8574_Handler_t *Handler, PCF8574_Device_t Device,
+             uint8_t Address)
 {
   if (!Handler)
+    return PCF8574_INVALID_PARAM;
+
+  if (Device != PCF8574_DEVICE_PCF8574 &&
+      Device != PCF8574_DEVICE_PCF8574A)
+    return PCF8574_INVALID_PARAM;
+  Handler->Device = Device;
+
+  if (PCF8574_SetAddressI2C(Handler, Address) != PCF8574_OK)
     return PCF8574_INVALID_PARAM;
 
   if (!Handler->Platform.Send || !Handler->Platform.Receive)
@@ -88,3 +107,34 @@ PCF8574_DeInit(PCF8574_Handler_t *Handler)
   return PCF8574_OK;
 }
 
+
+/**
+ * @brief  Set I2C Address
+ * @param  Handler: Pointer to handler
+ * @param  Address: Address pins state (0 <= Address <= 7)
+ * @retval PCF8574_Result_t
+ *         - PCF8574_OK: Operation was successful.
+ *         - PCF8574_INVALID_PARAM: One of parameters is invalid.
+ */
+PCF8574_Result_t
+PCF8574_SetAddressI2C(PCF8574_Handler_t *Handler, uint8_t Address)
+{
+  if (Address > 7)
+    return PCF8574_INVALID_PARAM;
+
+  switch (Handler->Device)
+  {
+  case PCF8574_DEVICE_PCF8574:
+    Handler->AddressI2C = PCF8574_I2C_ADDRESS_BASE | Address;
+    break;
+
+  case PCF8574_DEVICE_PCF8574A:
+    Handler->AddressI2C = PCF8574A_I2C_ADDRESS_BASE | Address;
+    break;
+  
+  default:
+    return PCF8574_INVALID_PARAM;
+  }
+
+  return PCF8574_OK;
+}
