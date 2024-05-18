@@ -254,6 +254,20 @@ PCF8574_Result_t
 PCF8574_Write(PCF8574_Handler_t *Handler, uint8_t Data);
 
 
+/**
+ * @brief  Write data to the one bit
+ * @param  Handler: Pointer to handler
+ * @param  Pos: Position of bit (0 <= Pos <= 7)
+ * @param  Value: Value to write (1: High, 0: Low)
+ * @retval PCF8574_Result_t
+ *         - PCF8574_OK: Operation was successful.
+ *         - PCF8574_FAIL: Failed to send or receive data.
+ *         - PCF8574_INVALID_PARAM: One of parameters is invalid.
+ */
+PCF8574_Result_t
+PCF8574_WriteOne(PCF8574_Handler_t *Handler, uint8_t Pos, uint8_t Value);
+
+
 
 #ifdef __cplusplus
 }
