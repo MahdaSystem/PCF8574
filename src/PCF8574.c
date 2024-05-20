@@ -250,3 +250,45 @@ PCF8574_WriteOne(PCF8574_Handler_t *Handler, uint8_t Pos, uint8_t Value)
 
   return PCF8574_OK;
 }
+
+
+/**
+ * @brief  Toggle the output bits
+ * @param  Handler: Pointer to handler
+ * @param  Mask: Mask of bits to toggle
+ * @retval PCF8574_Result_t
+ *         - PCF8574_OK: Operation was successful.
+ *         - PCF8574_FAIL: Failed to send or receive data.
+ */
+PCF8574_Result_t
+PCF8574_Toggle(PCF8574_Handler_t *Handler, uint8_t Mask)
+{
+  Handler->Output ^= (Mask & Handler->Direction) | ~Handler->Direction;
+  if (PCF8574_WriteReg(Handler, Handler->Output) != PCF8574_OK)
+    return PCF8574_FAIL;
+
+  return PCF8574_OK; 
+}
+
+
+/**
+ * @brief  Toggle the one bit
+ * @param  Handler: Pointer to handler
+ * @param  Pos: Position of bit (0 <= Pos <= 7)
+ * @retval PCF8574_Result_t
+ *         - PCF8574_OK: Operation was successful.
+ *         - PCF8574_FAIL: Failed to send or receive data.
+ *         - PCF8574_INVALID_PARAM: One of parameters is invalid.
+ */
+PCF8574_Result_t
+PCF8574_ToggleOne(PCF8574_Handler_t *Handler, uint8_t Pos)
+{
+  if (Pos > 7)
+    return PCF8574_INVALID_PARAM;
+
+  Handler->Output ^= (1 << Pos) & Handler->Direction;
+  if (PCF8574_WriteReg(Handler, Handler->Output) != PCF8574_OK)
+    return PCF8574_FAIL;
+
+  return PCF8574_OK;
+}

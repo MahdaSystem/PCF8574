@@ -268,6 +268,31 @@ PCF8574_Result_t
 PCF8574_WriteOne(PCF8574_Handler_t *Handler, uint8_t Pos, uint8_t Value);
 
 
+/**
+ * @brief  Toggle the output bits
+ * @param  Handler: Pointer to handler
+ * @param  Mask: Mask of bits to toggle
+ * @retval PCF8574_Result_t
+ *         - PCF8574_OK: Operation was successful.
+ *         - PCF8574_FAIL: Failed to send or receive data.
+ */
+PCF8574_Result_t
+PCF8574_Toggle(PCF8574_Handler_t *Handler, uint8_t Mask);
+
+
+/**
+ * @brief  Toggle the one bit
+ * @param  Handler: Pointer to handler
+ * @param  Pos: Position of bit (0 <= Pos <= 7)
+ * @retval PCF8574_Result_t
+ *         - PCF8574_OK: Operation was successful.
+ *         - PCF8574_FAIL: Failed to send or receive data.
+ *         - PCF8574_INVALID_PARAM: One of parameters is invalid.
+ */
+PCF8574_Result_t
+PCF8574_ToggleOne(PCF8574_Handler_t *Handler, uint8_t Pos);
+
+
 
 #ifdef __cplusplus
 }
