@@ -185,6 +185,31 @@ PCF8574_SetDir(PCF8574_Handler_t *Handler, uint8_t Dir)
 
 
 /**
+ * @brief  Set the direction of one bit
+ * @param  Handler: Pointer to handler
+ * @param  Pos: Position of bit (0 <= Pos <= 7)
+ * @param  Dir: Direction of bit (1: Output, 0: Input)
+ * @retval PCF8574_Result_t
+ *         - PCF8574_OK: Operation was successful.
+ *         - PCF8574_FAIL: Failed to send or receive data.
+ *         - PCF8574_INVALID_PARAM: One of parameters is invalid.
+ */
+PCF8574_Result_t
+PCF8574_SetDirOne(PCF8574_Handler_t *Handler, uint8_t Pos, uint8_t Dir)
+{
+  if (Pos > 7)
+    return PCF8574_INVALID_PARAM;
+
+  if (Dir)
+    Handler->Direction |= (1 << Pos);
+  else
+    Handler->Direction &= ~(1 << Pos);
+
+  return PCF8574_OK;
+}
+
+
+/**
  * @brief  Read data from the device
  * @param  Handler: Pointer to handler
  * @param  Data: Pointer to data
